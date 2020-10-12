@@ -39,7 +39,6 @@ static void draw_surface (EGLSurface surface, float r, float g, float b) {
 
 // listeners
 static void registry_add_object (void *data, struct wl_registry *registry, uint32_t name, const char *interface, uint32_t version) {
-    (void)data; (void)version;
     if (!strcmp(interface, wl_compositor_interface.name)) {
         compositor = wl_registry_bind (registry, name, &wl_compositor_interface, 1);
     }
@@ -50,26 +49,16 @@ static void registry_add_object (void *data, struct wl_registry *registry, uint3
         layer_shell = wl_registry_bind (registry, name, &zwlr_layer_shell_v1_interface, 1);
     }
 }
-static void registry_remove_object (void *data, struct wl_registry *registry, uint32_t name) {
-    (void)data; (void)registry; (void)name;
-}
+static void registry_remove_object (void *data, struct wl_registry *registry, uint32_t name) {}
 static struct wl_registry_listener registry_listener = {&registry_add_object, &registry_remove_object};
 
-void layer_surface_configure (
-    void *data,
-    struct zwlr_layer_surface_v1 *zwlr_layer_surface_v1,
-    uint32_t serial,
-    uint32_t width,
-    uint32_t height) {
-    (void)serial; (void)zwlr_layer_surface_v1;
+void layer_surface_configure (void *data, struct zwlr_layer_surface_v1 *zwlr_layer_surface_v1, uint32_t serial, uint32_t width, uint32_t height) {
     struct window *window = data;
     zwlr_layer_surface_v1_ack_configure (window->main.layer_surface, serial);
     wl_egl_window_resize (window->main.egl_window, width, height, 0, 0);
     draw_surface (window->main.egl_surface, 0.0, 0.5, 1.0);
 }
-void layer_surface_closed (void *data, struct zwlr_layer_surface_v1 *zwlr_layer_surface_v1) {
-    (void)data; (void)zwlr_layer_surface_v1;
-}
+void layer_surface_closed (void *data, struct zwlr_layer_surface_v1 *zwlr_layer_surface_v1) {}
 
 static struct zwlr_layer_surface_v1_listener layer_surface_listener = {&layer_surface_configure, &layer_surface_closed};
 
