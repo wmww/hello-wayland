@@ -17,14 +17,18 @@ wayland_protocols = dependency('wayland-protocols', version: '>=1.16', required:
 
 subdir('protocol')
 
-srcs = files(
-    'layer-shell-subsurface.c',
-)
+deps = [
+    dependency('wayland-client'),
+    dependency('wayland-egl'),
+    dependency('egl'),
+    dependency('gl')]
 
 example = executable('layer-shell-subsurface',
-    srcs, protocol_srcs,
-    dependencies: [
-        dependency('wayland-client'),
-        dependency('wayland-egl'),
-        dependency('egl'),
-        dependency('gl')])
+    'layer-shell-subsurface.c',
+    protocol_srcs,
+    dependencies: deps)
+
+example = executable('egl-window',
+    'egl-window.c',
+    protocol_srcs,
+    dependencies: deps)
