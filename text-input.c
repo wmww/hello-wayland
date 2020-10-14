@@ -37,6 +37,12 @@ struct window {
 
 static void draw_window(struct window *window);
 
+static void xdg_wm_base_ping(void *data, struct xdg_wm_base *xdg_wm_base, uint32_t serial) {
+    xdg_wm_base_pong(xdg_wm_base, serial);
+}
+
+static struct xdg_wm_base_listener xdg_wm_base_listener = {&xdg_wm_base_ping};
+
 static void registry_add_object(void *data, struct wl_registry *registry, uint32_t name, const char *interface, uint32_t version) {
     if (!strcmp(interface, wl_compositor_interface.name)) {
         compositor = wl_registry_bind(registry, name, &wl_compositor_interface, 1);
@@ -44,6 +50,7 @@ static void registry_add_object(void *data, struct wl_registry *registry, uint32
         seat = wl_registry_bind(registry, name, &wl_seat_interface, 4);
     } else if (!strcmp(interface, xdg_wm_base_interface.name)) {
         xdg_wm_base = wl_registry_bind(registry, name, &xdg_wm_base_interface, 1);
+        xdg_wm_base_add_listener(xdg_wm_base, &xdg_wm_base_listener, NULL);
     } else if (!strcmp(interface, zwp_text_input_manager_v3_interface.name)) {
         text_input_manager = wl_registry_bind(registry, name, &zwp_text_input_manager_v3_interface, 1);
     }
