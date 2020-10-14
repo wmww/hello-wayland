@@ -36,6 +36,7 @@ struct window {
 };
 
 static void draw_window(struct window *window);
+static void window_apply_text_input_state(struct window *window);
 
 static void xdg_wm_base_ping(void *data, struct xdg_wm_base *xdg_wm_base, uint32_t serial) {
     xdg_wm_base_pong(xdg_wm_base, serial);
@@ -72,23 +73,9 @@ static void pointer_motion(void *data, struct wl_pointer *wl_pointer, uint32_t t
 static void pointer_button(void *data, struct wl_pointer *wl_pointer, uint32_t serial, uint32_t time, uint32_t button, uint32_t state) {
     struct window *window = data;
     if (state == WL_POINTER_BUTTON_STATE_PRESSED) {
-        window->state = !window->state;
+        window->state = (window->state + 1) % 4;
         draw_window(window);
-        if (window->state) {
-            zwp_text_input_v3_enable(text_input);
-            zwp_text_input_v3_set_surrounding_text(text_input, "", 0, 0);
-            zwp_text_input_v3_set_text_change_cause(text_input, ZWP_TEXT_INPUT_V3_CHANGE_CAUSE_OTHER);
-            zwp_text_input_v3_commit(text_input);
-            zwp_text_input_v3_enable(text_input);
-            zwp_text_input_v3_set_surrounding_text(text_input, "", 0, 0);
-            zwp_text_input_v3_set_text_change_cause(text_input, ZWP_TEXT_INPUT_V3_CHANGE_CAUSE_INPUT_METHOD);
-            zwp_text_input_v3_set_content_type(text_input, 0, ZWP_TEXT_INPUT_V3_CONTENT_PURPOSE_NORMAL);
-            zwp_text_input_v3_set_cursor_rectangle(text_input, 10, 10, 0, 20);
-            zwp_text_input_v3_commit(text_input);
-        } else {
-            zwp_text_input_v3_disable(text_input);
-            zwp_text_input_v3_commit(text_input);
-        }
+        window_apply_text_input_state(window);
     }
 }
 
@@ -120,14 +107,7 @@ static struct xdg_toplevel_listener xdg_toplevel_listener = {&xdg_toplevel_confi
 
 static void text_input_enter(void *data, struct zwp_text_input_v3 *zwp_text_input_v3, struct wl_surface *surface) {
     struct window *window = data;
-    if (window->state) {
-        zwp_text_input_v3_enable(zwp_text_input_v3);
-        zwp_text_input_v3_set_surrounding_text(zwp_text_input_v3, "", 0, 0);
-        zwp_text_input_v3_set_text_change_cause(zwp_text_input_v3, ZWP_TEXT_INPUT_V3_CHANGE_CAUSE_INPUT_METHOD);
-        zwp_text_input_v3_set_content_type(zwp_text_input_v3, 0, ZWP_TEXT_INPUT_V3_CONTENT_PURPOSE_NORMAL);
-        zwp_text_input_v3_set_cursor_rectangle(zwp_text_input_v3, 10, 10, 0, 20);
-        zwp_text_input_v3_commit(zwp_text_input_v3);
-    }
+    window_apply_text_input_state(window);
 }
 
 static void text_input_leave(void *data, struct zwp_text_input_v3 *zwp_text_input_v3, struct wl_surface *surface) {}
@@ -188,10 +168,47 @@ static struct window *create_window(int width, int height) {
 }
 
 static void draw_window(struct window *window) {
-    if (window->state) {
-        draw_surface(window->surface, 0.2, 0.6, 1.0);
-    } else {
-        draw_surface(window->surface, 0.0, 0.2, 0.4);
+    switch (window->state) {
+        case 0:
+        case 2:
+            draw_surface(window->surface, 0.2, 0.2, 0.2);
+            break;
+
+        case 1:
+            draw_surface(window->surface, 1.0, 0.8, 0.0);
+            break;
+
+        case 3:
+            draw_surface(window->surface, 0.0, 1.0, 0.2);
+    }
+}
+
+static void window_apply_text_input_state(struct window *window) {
+    switch (window->state) {
+        case 0:
+        case 2:
+            zwp_text_input_v3_disable(text_input);
+            zwp_text_input_v3_commit(text_input);
+            break;
+
+        case 1:
+            zwp_text_input_v3_enable(text_input);
+            zwp_text_input_v3_set_surrounding_text(text_input, "", 0, 0);
+            zwp_text_input_v3_set_text_change_cause(text_input, ZWP_TEXT_INPUT_V3_CHANGE_CAUSE_OTHER);
+            zwp_text_input_v3_commit(text_input);
+            break;
+
+        case 3:
+            zwp_text_input_v3_enable(text_input);
+            zwp_text_input_v3_set_surrounding_text(text_input, "", 0, 0);
+            zwp_text_input_v3_set_text_change_cause(text_input, ZWP_TEXT_INPUT_V3_CHANGE_CAUSE_OTHER);
+            zwp_text_input_v3_commit(text_input);
+            zwp_text_input_v3_enable(text_input);
+            zwp_text_input_v3_set_surrounding_text(text_input, "", 0, 0);
+            zwp_text_input_v3_set_text_change_cause(text_input, ZWP_TEXT_INPUT_V3_CHANGE_CAUSE_INPUT_METHOD);
+            zwp_text_input_v3_set_content_type(text_input, 0, ZWP_TEXT_INPUT_V3_CONTENT_PURPOSE_NORMAL);
+            zwp_text_input_v3_set_cursor_rectangle(text_input, 10, 10, 0, 20);
+            zwp_text_input_v3_commit(text_input);
     }
 }
 
