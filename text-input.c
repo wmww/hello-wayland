@@ -193,21 +193,13 @@ static void window_apply_text_input_state(struct window *window) {
 
         case 1:
             zwp_text_input_v3_enable(text_input);
-            zwp_text_input_v3_set_surrounding_text(text_input, "", 0, 0);
-            zwp_text_input_v3_set_text_change_cause(text_input, ZWP_TEXT_INPUT_V3_CHANGE_CAUSE_OTHER);
             zwp_text_input_v3_commit(text_input);
             break;
 
         case 3:
             zwp_text_input_v3_enable(text_input);
-            zwp_text_input_v3_set_surrounding_text(text_input, "", 0, 0);
-            zwp_text_input_v3_set_text_change_cause(text_input, ZWP_TEXT_INPUT_V3_CHANGE_CAUSE_OTHER);
             zwp_text_input_v3_commit(text_input);
             zwp_text_input_v3_enable(text_input);
-            zwp_text_input_v3_set_surrounding_text(text_input, "", 0, 0);
-            zwp_text_input_v3_set_text_change_cause(text_input, ZWP_TEXT_INPUT_V3_CHANGE_CAUSE_INPUT_METHOD);
-            zwp_text_input_v3_set_content_type(text_input, 0, ZWP_TEXT_INPUT_V3_CONTENT_PURPOSE_NORMAL);
-            zwp_text_input_v3_set_cursor_rectangle(text_input, 10, 10, 0, 20);
             zwp_text_input_v3_commit(text_input);
     }
 }
