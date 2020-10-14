@@ -76,6 +76,14 @@ static void pointer_button(void *data, struct wl_pointer *wl_pointer, uint32_t s
         draw_window(window);
         if (window->state) {
             zwp_text_input_v3_enable(text_input);
+            zwp_text_input_v3_set_surrounding_text(text_input, "", 0, 0);
+            zwp_text_input_v3_set_text_change_cause(text_input, ZWP_TEXT_INPUT_V3_CHANGE_CAUSE_OTHER);
+            zwp_text_input_v3_commit(text_input);
+            zwp_text_input_v3_enable(text_input);
+            zwp_text_input_v3_set_surrounding_text(text_input, "", 0, 0);
+            zwp_text_input_v3_set_text_change_cause(text_input, ZWP_TEXT_INPUT_V3_CHANGE_CAUSE_INPUT_METHOD);
+            zwp_text_input_v3_set_content_type(text_input, 0, ZWP_TEXT_INPUT_V3_CONTENT_PURPOSE_NORMAL);
+            zwp_text_input_v3_set_cursor_rectangle(text_input, 10, 10, 0, 20);
             zwp_text_input_v3_commit(text_input);
         } else {
             zwp_text_input_v3_disable(text_input);
@@ -114,6 +122,10 @@ static void text_input_enter(void *data, struct zwp_text_input_v3 *zwp_text_inpu
     struct window *window = data;
     if (window->state) {
         zwp_text_input_v3_enable(zwp_text_input_v3);
+        zwp_text_input_v3_set_surrounding_text(zwp_text_input_v3, "", 0, 0);
+        zwp_text_input_v3_set_text_change_cause(zwp_text_input_v3, ZWP_TEXT_INPUT_V3_CHANGE_CAUSE_INPUT_METHOD);
+        zwp_text_input_v3_set_content_type(zwp_text_input_v3, 0, ZWP_TEXT_INPUT_V3_CONTENT_PURPOSE_NORMAL);
+        zwp_text_input_v3_set_cursor_rectangle(zwp_text_input_v3, 10, 10, 0, 20);
         zwp_text_input_v3_commit(zwp_text_input_v3);
     }
 }
@@ -177,9 +189,9 @@ static struct window *create_window(int width, int height) {
 
 static void draw_window(struct window *window) {
     if (window->state) {
-        draw_surface(window->surface, 0.0, 1.0, 0.5);
+        draw_surface(window->surface, 0.2, 0.6, 1.0);
     } else {
-        draw_surface(window->surface, 0.0, 0.5, 1.0);
+        draw_surface(window->surface, 0.0, 0.2, 0.4);
     }
 }
 
