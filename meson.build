@@ -32,3 +32,8 @@ example = executable('egl-window',
     'egl-window.c',
     protocol_srcs,
     dependencies: deps)
+
+example = executable('text-input',
+    'text-input.c',
+    protocol_srcs,
+    dependencies: deps)

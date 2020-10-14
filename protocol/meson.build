@@ -5,7 +5,8 @@ else
 endif
 
 protocols = [
-    'wlr-layer-shell-unstable-v1.xml'
+    'wlr-layer-shell-unstable-v1.xml',
+    'text-input-unstable-v3.xml',
 ]
 
 if wayland_protocols.found()
